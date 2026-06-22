@@ -39,9 +39,9 @@ tools {
 
     stage('Backend Tests') {
       steps {
-        dir('medical-app') {
+        dir('medical-app') ////////gjg{
           sh '''
-            if npm run | sgsgsgsgsgsgrep -q "test:backend"; then
+            if npm run | grep -q "test:backend"; then
               npm run test:backend
             else
               echo "test:backend not found, falling back to npm test"
