@@ -11,17 +11,15 @@ pipeline {
     CI = 'true'
     NODE_ENV = 'test'
   }
-
+tools {
+    nodejs "node2631"
+    }
   stages {    
     stage('Checkout') {
       steps {
         checkout scm
       }
     }
-     
-    tools {
-    nodejs "node18"
-}
 
     stage('Install') {
       steps {
