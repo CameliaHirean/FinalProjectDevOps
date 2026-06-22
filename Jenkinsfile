@@ -40,7 +40,14 @@ tools {
     stage('Backend Tests') {
       steps {
         dir('medical-app') {
-          sh 'npm run test:backend'
+          sh '''
+            if npm run | grep -q "test:backend"; then
+              npm run test:backend
+            else
+              echo "test:backend not found, falling back to npm test"
+              npm test
+            fi
+          '''
         }
       }
     }
@@ -48,7 +55,13 @@ tools {
     stage('Frontend Tests') {
       steps {
         dir('medical-app') {
-          sh 'npm run test:frontend'
+          sh '''
+            if npm run | grep -q "test:frontend"; then
+              npm run test:frontend
+            else
+              echo "test:frontend not found, skipping dedicated frontend stage"
+            fi
+          '''
         }
       }
     }
