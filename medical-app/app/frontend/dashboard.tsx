@@ -166,7 +166,7 @@ export default function Dashboard() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const newRecord: RecordEntry = buildNewRecord(form);
+    const newRecord = buildNewRecord(form) as RecordEntry;
 
     try {
       const response = await fetch('/api/records', {
