@@ -18,6 +18,7 @@ tools {
     stage('Checkout') {
       steps {
         checkout scm
+        echo "CHANGE_ID = ${env.CHANGE_ID}"
       }
     }
 
