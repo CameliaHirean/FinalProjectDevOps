@@ -40,7 +40,7 @@ tools {
 
     stage('Backend Tests') {
       steps {
-        dir('medical-app') ////////gjg{
+        dir('medical-app') {
           sh '''
             if npm run | grep -q "test:backend"; then
               npm run test:backend
