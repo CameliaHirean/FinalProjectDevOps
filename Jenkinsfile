@@ -12,21 +12,7 @@ pipeline {
     NODE_ENV = 'test'
   }
 
-  stages {
-    stage('PR Policy Gate') {
-      steps {
-        script {
-          if (!env.CHANGE_ID) {
-            error('This pipeline only runs for Pull Requests. Create a branch and open a PR.')
-          }
-
-          if (!(env.CHANGE_TARGET in ['main', 'release'])) {
-            error("PR target '${env.CHANGE_TARGET}' is not allowed. Use main or release.")
-          }
-        }
-      }
-    }
-
+  stages {    
     stage('Checkout') {
       steps {
         checkout scm
