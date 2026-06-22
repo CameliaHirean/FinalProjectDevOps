@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { buildNewRecord } from './record-helpers';
 
 type RecordEntry = {
   id: string;
@@ -165,23 +166,7 @@ export default function Dashboard() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const newRecord = {
-      id: `demo-${Date.now()}`,
-      created_at: new Date().toISOString(),
-      heart_rate: Number(form.heart_rate) || 76,
-      blood_pressure_systolic: Number(form.systolic) || 120,
-      blood_pressure_diastolic: Number(form.diastolic) || 80,
-      oxygen_saturation: Number(form.oxygen) || 98,
-      blood_sugar: Number(form.sugar) || 95,
-      weight: Number(form.weight) || 72,
-      liver_alt: 25,
-      liver_ast: 23,
-      kidney_creatinine: 0.95,
-      kidney_bun: 17,
-      cholesterol_total: 182,
-      cholesterol_hdl: 52,
-      cholesterol_ldl: 111
-    };
+    const newRecord: RecordEntry = buildNewRecord(form);
 
     try {
       const response = await fetch('/api/records', {
@@ -191,7 +176,7 @@ export default function Dashboard() {
       });
 
       if (response.ok) {
-        const savedRecord = await response.json();
+        const savedRecord = (await response.json()) as RecordEntry;
         setRecords((prev) => [savedRecord || newRecord, ...prev]);
         setForm({});
         setActivePage('history');
