@@ -98,7 +98,7 @@ tools {
             def repoPath = sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
               .replaceAll(/.*github\.com[\/:]/,  '')
               .replaceAll(/\.git$/, '')
-            withCredentials([string(credentialsId: 'github-scm-credentials', variable: 'GH_TOKEN')]) {
+            withCredentials([usernamePassword(credentialsId: 'github-scm-credentials', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
               sh """
                 curl -s -o /dev/null \\
                   -H 'Authorization: token ${GH_TOKEN}' \\
@@ -123,7 +123,7 @@ tools {
             def repoPath = sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
               .replaceAll(/.*github\.com[\/:]/,  '')
               .replaceAll(/\.git$/, '')
-            withCredentials([string(credentialsId: 'github-scm-credentials', variable: 'GH_TOKEN')]) {
+            withCredentials([usernamePassword(credentialsId: 'github-scm-credentials', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
               sh """
                 curl -s -o /dev/null \\
                   -H 'Authorization: token ${GH_TOKEN}' \\
