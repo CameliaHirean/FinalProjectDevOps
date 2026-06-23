@@ -93,35 +93,41 @@ tools {
     success {
       echo 'CI passed. Merge can proceed.'
       script {
-            def repo = env.GIT_URL.tokenize('/').last().replace('.git','')
-            def owner = env.GIT_URL.tokenize('/')[-2]
-            def comment = "✅ Jenkins CI passed for PR #${env.CHANGE_ID}. Build: ${env.BUILD_URL}"
-
+        if (env.CHANGE_ID && env.GIT_URL) {
+          def repo = env.GIT_URL.tokenize('/').last().replace('.git', '')
+          def owner = env.GIT_URL.tokenize('/')[-2]
+          withCredentials([string(credentialsId: 'github-scm-credentials', variable: 'GH_TOKEN')]) {
             sh """
-            curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
-                 -H "Content-Type: application/json" \
-                 -X POST \
-                 -d '{ "body": "${comment}" }' \
-                 https://api.github.com/repos/${owner}/${repo}/issues/${env.CHANGE_ID}/comments
+              curl -s -o /dev/null \\
+                -H 'Authorization: token ${GH_TOKEN}' \\
+                -H 'Content-Type: application/json' \\
+                -X POST \\
+                -d '{"body":"CI passed for PR #${env.CHANGE_ID}. Build: ${env.BUILD_URL}"}' \\
+                https://api.github.com/repos/${owner}/${repo}/issues/${env.CHANGE_ID}/comments || true
             """
+          }
         }
+      }
     }
 
     failure {
       echo 'CI failed. Please check the logs.'
       script {
-            def repo = env.GIT_URL.tokenize('/').last().replace('.git','')
-            def owner = env.GIT_URL.tokenize('/')[-2]
-            def comment = "❌ Jenkins CI failed for PR #${env.CHANGE_ID}. Build: ${env.BUILD_URL}"
-
+        if (env.CHANGE_ID && env.GIT_URL) {
+          def repo = env.GIT_URL.tokenize('/').last().replace('.git', '')
+          def owner = env.GIT_URL.tokenize('/')[-2]
+          withCredentials([string(credentialsId: 'github-scm-credentials', variable: 'GH_TOKEN')]) {
             sh """
-            curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
-                 -H "Content-Type: application/json" \
-                 -X POST \
-                 -d '{ "body": "${comment}" }' \
-                 https://api.github.com/repos/${owner}/${repo}/issues/${env.CHANGE_ID}/comments
+              curl -s -o /dev/null \\
+                -H 'Authorization: token ${GH_TOKEN}' \\
+                -H 'Content-Type: application/json' \\
+                -X POST \\
+                -d '{"body":"CI failed for PR #${env.CHANGE_ID}. Build: ${env.BUILD_URL}"}' \\
+                https://api.github.com/repos/${owner}/${repo}/issues/${env.CHANGE_ID}/comments || true
             """
+          }
         }
+      }
     }
   }
 }
