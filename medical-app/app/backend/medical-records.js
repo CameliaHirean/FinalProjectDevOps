@@ -1,4 +1,4 @@
-const MEDICAL_RECORD_COLUMNS = [
+export const MEDICAL_RECORD_COLUMNS = [
   'id',
   'created_at',
   'heart_rate',
@@ -16,7 +16,7 @@ const MEDICAL_RECORD_COLUMNS = [
   'cholesterol_ldl'
 ];
 
-function buildMedicalRecordInsertValues(body, now = new Date()) {
+export function buildMedicalRecordInsertValues(body, now = new Date()) {
   return [
     body.id ?? `record-${now.getTime()}`,
     body.created_at ?? now.toISOString(),
@@ -35,8 +35,3 @@ function buildMedicalRecordInsertValues(body, now = new Date()) {
     body.cholesterol_ldl ?? null
   ];
 }
-
-module.exports = {
-  MEDICAL_RECORD_COLUMNS,
-  buildMedicalRecordInsertValues
-};
