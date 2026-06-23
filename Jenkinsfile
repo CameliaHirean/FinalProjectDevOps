@@ -92,42 +92,36 @@ tools {
   post {
     success {
       echo 'CI passed. Merge can proceed.'
+      script {
+            def repo = env.GIT_URL.tokenize('/').last().replace('.git','')
+            def owner = env.GIT_URL.tokenize('/')[-2]
+            def comment = "✅ Jenkins CI passed for PR #${env.CHANGE_ID}. Build: ${env.BUILD_URL}"
+
+            sh """
+            curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
+                 -H "Content-Type: application/json" \
+                 -X POST \
+                 -d '{ "body": "${comment}" }' \
+                 https://api.github.com/repos/${owner}/${repo}/issues/${env.CHANGE_ID}/comments
+            """
+        }
     }
 
     failure {
+      echo 'CI failed. Please check the logs.'
       script {
-        if (env.CHANGE_ID) {
-          dir('medical-app') {
-            sh '''
-              set +e
-              COMMENT="Jenkins CI failed for ${JOB_NAME} #${BUILD_NUMBER}. See ${BUILD_URL}"
-              REPO_URL="$(git config --get remote.origin.url)"
+            def repo = env.GIT_URL.tokenize('/').last().replace('.git','')
+            def owner = env.GIT_URL.tokenize('/')[-2]
+            def comment = "❌ Jenkins CI failed for PR #${env.CHANGE_ID}. Build: ${env.BUILD_URL}"
 
-              case "$REPO_URL" in
-                git@github.com:*)
-                  REPO_PATH="${REPO_URL#git@github.com:}"
-                  ;;
-                https://github.com/*)
-                  REPO_PATH="${REPO_URL#https://github.com/}"
-                  ;;
-                *)
-                  REPO_PATH=""
-                  ;;
-              esac
-
-              REPO_PATH="${REPO_PATH%.git}"
-
-              if [ -n "${GITHUB_TOKEN:-}" ] && [ -n "${CHANGE_ID:-}" ] && [ -n "$REPO_PATH" ]; then
-                curl -fsS -X POST \
-                  -H "Authorization: Bearer $GITHUB_TOKEN" \
-                  -H "Accept: application/vnd.github+json" \
-                  "https://api.github.com/repos/$REPO_PATH/issues/$CHANGE_ID/comments" \
-                  -d "$(printf '{\"body\":\"%s\"}' "$COMMENT")" >/dev/null || true
-              fi
-            '''
-          }
+            sh """
+            curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
+                 -H "Content-Type: application/json" \
+                 -X POST \
+                 -d '{ "body": "${comment}" }' \
+                 https://api.github.com/repos/${owner}/${repo}/issues/${env.CHANGE_ID}/comments
+            """
         }
-      }
     }
   }
 }
