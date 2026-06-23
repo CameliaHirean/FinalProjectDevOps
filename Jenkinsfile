@@ -93,18 +93,23 @@ tools {
     success {
       echo 'CI passed. Merge can proceed.'
       script {
-        if (env.CHANGE_ID && env.GIT_URL) {
-          def repo = env.GIT_URL.tokenize('/').last().replace('.git', '')
-          def owner = env.GIT_URL.tokenize('/')[-2]
-          withCredentials([string(credentialsId: 'github-scm-credentials', variable: 'GH_TOKEN')]) {
-            sh """
-              curl -s -o /dev/null \\
-                -H 'Authorization: token ${GH_TOKEN}' \\
-                -H 'Content-Type: application/json' \\
-                -X POST \\
-                -d '{"body":"CI passed for PR #${env.CHANGE_ID}. Build: ${env.BUILD_URL}"}' \\
-                https://api.github.com/repos/${owner}/${repo}/issues/${env.CHANGE_ID}/comments || true
-            """
+        if (env.CHANGE_ID) {
+          try {
+            def repoPath = sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
+              .replaceAll(/.*github\.com[\/:]/,  '')
+              .replaceAll(/\.git$/, '')
+            withCredentials([string(credentialsId: 'github-scm-credentials', variable: 'GH_TOKEN')]) {
+              sh """
+                curl -s -o /dev/null \\
+                  -H 'Authorization: token ${GH_TOKEN}' \\
+                  -H 'Content-Type: application/json' \\
+                  -X POST \\
+                  -d '{"body":"CI passed for PR #${env.CHANGE_ID}. Build: ${env.BUILD_URL}"}' \\
+                  https://api.github.com/repos/${repoPath}/issues/${env.CHANGE_ID}/comments || true
+              """
+            }
+          } catch (e) {
+            echo "Could not post PR comment: ${e.message}"
           }
         }
       }
@@ -113,18 +118,23 @@ tools {
     failure {
       echo 'CI failed. Please check the logs.'
       script {
-        if (env.CHANGE_ID && env.GIT_URL) {
-          def repo = env.GIT_URL.tokenize('/').last().replace('.git', '')
-          def owner = env.GIT_URL.tokenize('/')[-2]
-          withCredentials([string(credentialsId: 'github-scm-credentials', variable: 'GH_TOKEN')]) {
-            sh """
-              curl -s -o /dev/null \\
-                -H 'Authorization: token ${GH_TOKEN}' \\
-                -H 'Content-Type: application/json' \\
-                -X POST \\
-                -d '{"body":"CI failed for PR #${env.CHANGE_ID}. Build: ${env.BUILD_URL}"}' \\
-                https://api.github.com/repos/${owner}/${repo}/issues/${env.CHANGE_ID}/comments || true
-            """
+        if (env.CHANGE_ID) {
+          try {
+            def repoPath = sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
+              .replaceAll(/.*github\.com[\/:]/,  '')
+              .replaceAll(/\.git$/, '')
+            withCredentials([string(credentialsId: 'github-scm-credentials', variable: 'GH_TOKEN')]) {
+              sh """
+                curl -s -o /dev/null \\
+                  -H 'Authorization: token ${GH_TOKEN}' \\
+                  -H 'Content-Type: application/json' \\
+                  -X POST \\
+                  -d '{"body":"CI failed for PR #${env.CHANGE_ID}. Build: ${env.BUILD_URL}"}' \\
+                  https://api.github.com/repos/${repoPath}/issues/${env.CHANGE_ID}/comments || true
+              """
+            }
+          } catch (e) {
+            echo "Could not post PR comment: ${e.message}"
           }
         }
       }
