@@ -15,7 +15,7 @@ tools {
     nodejs "node2631"
     }
   stages {    
-    /////////stage('Checkout') {
+    stage('Checkout') {
       steps {
         checkout scm
       }
