@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import medicalRecords from './medical-records.js';
+import { buildMedicalRecordInsertValues } from './medical-records.js';
 
 test('buildMedicalRecordInsertValues preserves explicit values', () => {
   const now = new Date('2026-06-20T12:34:56.000Z');
 
-  const values = medicalRecords.buildMedicalRecordInsertValues(
+  const values = buildMedicalRecordInsertValues(
     {
       id: 'record-123',
       created_at: '2026-06-19T00:00:00.000Z',
@@ -49,7 +49,7 @@ test('buildMedicalRecordInsertValues preserves explicit values', () => {
 test('buildMedicalRecordInsertValues fills defaults', () => {
   const now = new Date('2026-06-20T12:34:56.000Z');
 
-  const values = medicalRecords.buildMedicalRecordInsertValues({}, now);
+  const values = buildMedicalRecordInsertValues({}, now);
 
   assert.deepStrictEqual(values, [
     'record-1781958896000',

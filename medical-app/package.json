@@ -5,9 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "dev:lite": "next dev --webpack",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:backend": "node --test app/backend/medical-records.test.mjs",
+    "test:frontend": "node --test app/frontend/record-helpers.test.mjs",
+    "test": "node --test app/backend/medical-records.test.mjs app/frontend/record-helpers.test.mjs",
+    "db:check": "node app/backend/devops-db-check.mjs"
   },
   "dependencies": {
     "next": "16.2.7",
