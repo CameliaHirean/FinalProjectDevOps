@@ -81,7 +81,7 @@ tools {
       steps {
         script {
           def imageTag = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-          def imageName = 'ghcr.io/cameliaHirean/medical-app'
+          def imageName = 'ghcr.io/cameliahirean/medical-app'
           withCredentials([usernamePassword(credentialsId: 'github-scm-credentials', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
             dir('medical-app') {
               sh """
