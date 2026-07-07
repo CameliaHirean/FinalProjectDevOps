@@ -74,6 +74,29 @@ tools {
       }
     }
 
+    stage('Publish to GHCR') {
+      when {
+        branch 'master'
+      }
+      steps {
+        script {
+          def imageTag = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+          def imageName = 'ghcr.io/cameliaHirean/medical-app'
+          withCredentials([usernamePassword(credentialsId: 'github-scm-credentials', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
+            dir('medical-app') {
+              sh """
+                echo \${GH_TOKEN} | docker login ghcr.io -u \${GH_USER} --password-stdin
+                docker build -t ${imageName}:${imageTag} -t ${imageName}:latest .
+                docker push ${imageName}:${imageTag}
+                docker push ${imageName}:latest
+                docker logout ghcr.io
+              """
+            }
+          }
+        }
+      }
+    }
+
     stage('Database Verification') {
       steps {
         dir('medical-app') {
