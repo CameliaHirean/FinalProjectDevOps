@@ -14,4 +14,4 @@ COPY . .
 
 # Run API integration tests against the app container
 # STAGING_URL is injected by docker-compose at runtime
-CMD ["npm", "run", "test:integration:api"]
+CMD ["node", "--test", "app/integration/api.test.mjs"]
