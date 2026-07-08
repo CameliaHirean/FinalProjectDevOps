@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  app:
+    image: ghcr.io/cameliahirean/medical-app:latest
+    ports:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/hello"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      - STAGING_URL=http://app:3000
