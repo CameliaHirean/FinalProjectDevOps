@@ -4,10 +4,11 @@ services:
     ports:
       - "3000"
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/hello"]
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:3000/api/hello').then(r=>r.ok?process.exit(0):process.exit(1)).catch(()=>process.exit(1))\""]
       interval: 5s
-      timeout: 5s
-      retries: 10
+      timeout: 10s
+      retries: 12
+      start_period: 10s
 
   tests:
     build:
