@@ -1,0 +1,79 @@
+name: CD — Build, Test, Publish, Deploy
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: ghcr.io/cameliahirean/medical-app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        run: echo "IMAGE_TAG=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        working-directory: medical-app
+        run: |
+          docker build \
+            -t $IMAGE_NAME:$IMAGE_TAG \
+            -t $IMAGE_NAME:latest .
+
+      - name: Integration tests
+        working-directory: medical-app
+        run: |
+          docker compose -f docker-compose.test.yml up --build \
+            --abort-on-container-exit \
+            --exit-code-from tests
+
+      - name: Tear down test containers
+        if: always()
+        working-directory: medical-app
+        run: docker compose -f docker-compose.test.yml down --volumes 2>/dev/null || true
+
+      - name: Publish to GHCR
+        run: |
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push $IMAGE_NAME:$IMAGE_TAG
+          docker push $IMAGE_NAME:latest
+          docker logout ghcr.io
+
+      - name: Deploy to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          SSH_KEY:  ${{ secrets.EC2_SSH_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          # Write SSH key to temp file
+          echo "$SSH_KEY" > /tmp/ec2_key.pem
+          chmod 600 /tmp/ec2_key.pem
+
+          ssh -i /tmp/ec2_key.pem \
+              -o StrictHostKeyChecking=no \
+              ubuntu@$EC2_HOST << ENDSSH
+
+            # Pull the new image
+            docker pull ghcr.io/cameliahirean/medical-app:latest
+
+            # Stop and remove old container
+            docker stop medical-app-staging 2>/dev/null || true
+            docker rm   medical-app-staging 2>/dev/null || true
+
+            # Run new container with Supabase DATABASE_URL
+            docker run -d \
+              --name medical-app-staging \
+              --restart unless-stopped \
+              -p 3000:3000 \
+              -e DATABASE_URL="$DATABASE_URL" \
+              ghcr.io/cameliahirean/medical-app:latest
+
+          ENDSSH
+
+          rm -f /tmp/ec2_key.pem
+          echo "Deployed to http://$EC2_HOST:3000"
