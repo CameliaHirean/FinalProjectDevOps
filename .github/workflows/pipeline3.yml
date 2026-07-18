@@ -69,8 +69,10 @@ jobs:
 
           echo "Deploying image ${{ github.event.inputs.image_tag }} to $IDLE at $HOST"
 
-          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$HOST \
-            "bash ~/scripts/deploy_idle.sh ${{ github.event.inputs.image_tag }} $IDLE"
+          ssh -i key.pem ubuntu@$HOST \
+             "GHCR_TOKEN='${{ secrets.GHCR_TOKEN }}' \
+              GHCR_USERNAME='cameliahirean' \
+              bash ~/scripts/deploy_idle.sh ${{ github.event.inputs.image_tag }} $IDLE"
 
   # ---------------------------------------------------------
   # 3. Health check
