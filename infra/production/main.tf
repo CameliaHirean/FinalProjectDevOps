@@ -98,11 +98,11 @@ resource "aws_s3_bucket" "prod_sync" {
 locals {
   user_data = <<EOF
 #!/bin/bash
-yum update -y
-yum install docker -y
+apt-get update -y
+apt-get install -y docker.io
 systemctl enable docker
 systemctl start docker
-usermod -aG docker ec2-user
+usermod -aG docker ubuntu
 
 mkdir -p /opt/blue
 mkdir -p /opt/green
