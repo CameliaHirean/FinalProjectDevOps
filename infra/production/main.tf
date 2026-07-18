@@ -124,18 +124,37 @@ resource "aws_instance" "blue" {
   tags = {
     Name = "prod-blue"
   }
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    host        = self.public_ip
+    private_key = file(var.ec2_private_key_path)
+  }
+
+  provisioner "file" {
+    source      = "scripts/"
+    destination = "/home/ubuntu/scripts"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chmod -R +x /home/ubuntu/scripts",
+      "echo 'Scripts uploaded for BLUE instance'"
+    ]
+  }
 }
 
 # Elastic IP for BLUE
 resource "aws_eip" "blue_eip" {
-  instance = aws_instance.blue.id
-  domain   = "vpc"
-
-  tags = {
-    Name      = "blue-eip"
-    CreatedAt = timestamp()
-  }
+  domain        = "vpc"
+  allocation_id = "eipalloc-028b6920b32205f0c"
 }
+
+resource "aws_eip_association" "blue_assoc" {
+  instance_id   = aws_instance.blue.id
+  allocation_id = aws_eip.blue_eip.id
+}
+
 
 # --- Green EC2 ---
 resource "aws_instance" "green" {
@@ -150,18 +169,37 @@ resource "aws_instance" "green" {
   tags = {
     Name = "prod-green"
   }
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    host        = self.public_ip
+    private_key = file(var.ec2_private_key_path)
+  }
+
+  provisioner "file" {
+    source      = "scripts/"
+    destination = "/home/ubuntu/scripts"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chmod -R +x /home/ubuntu/scripts",
+      "echo 'Scripts uploaded for GREEN instance'"
+    ]
+  }
 }
 
 # Elastic IP for GREEN
 resource "aws_eip" "green_eip" {
-  instance = aws_instance.green.id
-  domain   = "vpc"
-
-  tags = {
-    Name      = "green-eip"
-    CreatedAt = timestamp()
-  }
+  domain        = "vpc"
+  allocation_id = "eipalloc-0d5f4d15ba12120de"
 }
+
+resource "aws_eip_association" "green_assoc" {
+  instance_id   = aws_instance.green.id
+  allocation_id = aws_eip.green_eip.id
+}
+
 
 # --- Nginx EC2 ---
 resource "aws_instance" "nginx" {
@@ -211,15 +249,34 @@ EOF
   tags = {
     Name = "prod-nginx"
   }
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    host        = self.public_ip
+    private_key = file(var.ec2_private_key_path)
+  }
+
+  provisioner "file" {
+    source      = "scripts/"
+    destination = "/home/ubuntu/scripts"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chmod -R +x /home/ubuntu/scripts",
+      "echo 'Scripts uploaded for NGINX instance'"
+    ]
+  }
 }
 
 # Elastic IP for NGINX
 resource "aws_eip" "nginx_eip" {
-  instance = aws_instance.nginx.id
-  domain   = "vpc"
-
-  tags = {
-    Name      = "nginx-eip"
-    CreatedAt = timestamp()
-  }
+  domain        = "vpc"
+  allocation_id = "eipalloc-02422f2a06ed54d66"
 }
+
+resource "aws_eip_association" "nginx_assoc" {
+  instance_id   = aws_instance.nginx.id
+  allocation_id = aws_eip.nginx_eip.id
+}
+
