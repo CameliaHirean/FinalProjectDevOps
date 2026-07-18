@@ -287,6 +287,16 @@ EOF
       "echo 'Scripts uploaded for NGINX instance'"
     ]
   }
+
+  provisioner "remote-exec" {
+  inline = [
+    "sudo mkdir -p /var/run",
+    "echo 'blue' | sudo tee /var/run/blue-green-state",
+    "sudo chown ubuntu:ubuntu /var/run/blue-green-state",
+    "sudo chmod 664 /var/run/blue-green-state"
+    ]
+  }
+
 }
 
 # Elastic IP for NGINX
