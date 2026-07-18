@@ -34,7 +34,7 @@ jobs:
         id: detect
         run: |
           IDLE=$(ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$NGINX_HOST \
-            "bash ~/scripts/pipeline3/detect_idle.sh")
+            "bash ~/scripts/detect_idle.sh")
 
           echo "Idle environment: $IDLE"
           echo "idle_env=$IDLE" >> $GITHUB_OUTPUT
@@ -70,7 +70,7 @@ jobs:
           echo "Deploying image ${{ github.event.inputs.image_tag }} to $IDLE at $HOST"
 
           ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$HOST \
-            "bash ~/scripts/pipeline3/deploy_to_idle.sh ${{ github.event.inputs.image_tag }} $IDLE"
+            "bash ~/scripts/deploy_to_idle.sh ${{ github.event.inputs.image_tag }} $IDLE"
 
 
   # ---------------------------------------------------------
@@ -103,7 +103,7 @@ jobs:
           echo "Running health check on $IDLE ($HOST)"
 
           ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$HOST \
-            "bash ~/scripts/pipeline3/health_check.sh $IDLE"
+            "bash ~/scripts/health_check.sh $IDLE"
 
 
   # ---------------------------------------------------------
@@ -129,7 +129,7 @@ jobs:
           echo "Switching Nginx traffic to $IDLE"
 
           ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$NGINX_HOST \
-            "bash ~/scripts/pipeline3/switch_traffic.sh $IDLE"
+            "bash ~/scripts/switch_traffic.sh $IDLE"
 
 
   # ---------------------------------------------------------
@@ -155,4 +155,4 @@ jobs:
           echo "Starting rollback monitor for $IDLE"
 
           ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$NGINX_HOST \
-            "bash ~/scripts/pipeline3/rollback_monitor.sh https://your-production-url $IDLE"
+            "bash ~/scripts/rollback_monitor.sh https://your-production-url $IDLE"

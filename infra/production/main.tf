@@ -131,6 +131,15 @@ resource "aws_instance" "blue" {
     private_key = file(var.ec2_private_key_path)
   }
 
+  provisioner "remote-exec" {
+  inline = [
+    "echo 'Creating remote scripts folder at /home/ubuntu/scripts'",
+    "mkdir -p /home/ubuntu/scripts",
+    "echo 'Remote scripts folder created:'",
+    "ls -la /home/ubuntu"
+  ]
+  }
+
   provisioner "file" {
     source      = "../../scripts/"
     destination = "/home/ubuntu/scripts"
@@ -145,13 +154,9 @@ resource "aws_instance" "blue" {
 }
 
 # Elastic IP for BLUE
-resource "aws_eip" "blue_eip" {
-  domain        = "vpc"
-}
-
 resource "aws_eip_association" "blue_assoc" {
   instance_id   = aws_instance.blue.id
-  allocation_id = "eipalloc-028b6920b32205f0c"
+  allocation_id = "eipalloc-040ea5b2f92d774f9"
 }
 
 
@@ -175,10 +180,20 @@ resource "aws_instance" "green" {
     private_key = file(var.ec2_private_key_path)
   }
 
+  provisioner "remote-exec" {
+  inline = [
+    "echo 'Creating remote scripts folder at /home/ubuntu/scripts'",
+    "mkdir -p /home/ubuntu/scripts",
+    "echo 'Remote scripts folder created:'",
+    "ls -la /home/ubuntu"
+  ]
+  }
+
   provisioner "file" {
     source      = "../../scripts/"
     destination = "/home/ubuntu/scripts"
   }
+
 
   provisioner "remote-exec" {
     inline = [
@@ -189,13 +204,9 @@ resource "aws_instance" "green" {
 }
 
 # Elastic IP for GREEN
-resource "aws_eip" "green_eip" {
-  domain        = "vpc"
-}
-
 resource "aws_eip_association" "green_assoc" {
   instance_id   = aws_instance.green.id
-    allocation_id = "eipalloc-0d5f4d15ba12120de"
+    allocation_id = "eipalloc-0d7e4f99575476d91"
 }
 
 
@@ -209,8 +220,9 @@ resource "aws_instance" "nginx" {
 
   user_data = <<EOF
 #!/bin/bash
-yum update -y
-yum install nginx -y
+apt-get update -y
+apt-get install -y nginx
+
 systemctl enable nginx
 systemctl start nginx
 
@@ -254,10 +266,20 @@ EOF
     private_key = file(var.ec2_private_key_path)
   }
 
+  provisioner "remote-exec" {
+    inline = [
+      "echo 'Creating remote scripts folder at /home/ubuntu/scripts'",
+      "mkdir -p /home/ubuntu/scripts",
+      "echo 'Remote scripts folder created:'",
+      "ls -la /home/ubuntu"
+    ]
+  }
+
   provisioner "file" {
     source      = "../../scripts/"
     destination = "/home/ubuntu/scripts"
   }
+
 
   provisioner "remote-exec" {
     inline = [
@@ -268,12 +290,8 @@ EOF
 }
 
 # Elastic IP for NGINX
-resource "aws_eip" "nginx_eip" {
-  domain        = "vpc"
-}
-
 resource "aws_eip_association" "nginx_assoc" {
   instance_id   = aws_instance.nginx.id
-  allocation_id = "eipalloc-02422f2a06ed54d66"
+  allocation_id = "eipalloc-0eb13bf7f05acc825"
 }
 
