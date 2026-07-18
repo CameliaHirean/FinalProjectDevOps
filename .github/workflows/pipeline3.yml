@@ -1,0 +1,93 @@
+name: Pipeline 3 - Production Blue/Green Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Docker image tag to deploy"
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      BLUE_HOST: ${{ secrets.BLUEGREEN_HOST_BLUE }}
+      GREEN_HOST: ${{ secrets.BLUEGREEN_HOST_GREEN }}
+      NGINX_HOST: ${{ secrets.NGINX_HOST }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------------
+      # 1. Detect idle environment (blue or green)
+      # ---------------------------------------------------------
+      - name: Detect idle environment
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@$NGINX_HOST \
+            "bash ~/scripts/pipeline3/detect_idle.sh" > idle.txt
+
+          echo "Idle environment detected:"
+          cat idle.txt
+
+      # ---------------------------------------------------------
+      # 2. Deploy image to idle environment
+      # ---------------------------------------------------------
+      - name: Deploy to idle environment
+        run: |
+          IDLE=$(cat idle.txt)
+
+          if [ "$IDLE" = "blue" ]; then
+            HOST=${BLUE_HOST}
+          else
+            HOST=${GREEN_HOST}
+          fi
+
+          echo "Deploying image ${{ github.event.inputs.image_tag }} to $IDLE at $HOST"
+
+          ssh -o StrictHostKeyChecking=no ec2-user@$HOST \
+            "bash ~/scripts/pipeline3/deploy_to_idle.sh ${{ github.event.inputs.image_tag }} $IDLE"
+
+      # ---------------------------------------------------------
+      # 3. Health check on idle environment
+      # ---------------------------------------------------------
+      - name: Health check
+        run: |
+          IDLE=$(cat idle.txt)
+
+          if [ "$IDLE" = "blue" ]; then
+            HOST=${BLUE_HOST}
+          else
+            HOST=${GREEN_HOST}
+          fi
+
+          echo "Running health check on $IDLE ($HOST)"
+
+          ssh -o StrictHostKeyChecking=no ec2-user@$HOST \
+            "bash ~/scripts/pipeline3/health_check.sh $IDLE"
+
+      # ---------------------------------------------------------
+      # 4. Switch Nginx traffic to idle environment
+      # ---------------------------------------------------------
+      - name: Switch traffic
+        run: |
+          IDLE=$(cat idle.txt)
+
+          echo "Switching Nginx traffic to $IDLE"
+
+          ssh -o StrictHostKeyChecking=no ec2-user@$NGINX_HOST \
+            "bash ~/scripts/pipeline3/switch_traffic.sh $IDLE"
+
+      # ---------------------------------------------------------
+      # 5. Rollback monitor
+      # ---------------------------------------------------------
+      - name: Rollback monitor
+        run: |
+          IDLE=$(cat idle.txt)
+
+          echo "Starting rollback monitor for $IDLE"
+
+          ssh -o StrictHostKeyChecking=no ec2-user@$NGINX_HOST \
+            "bash ~/scripts/pipeline3/rollback_monitor.sh https://your-production-url $IDLE"
