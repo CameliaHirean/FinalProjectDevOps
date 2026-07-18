@@ -126,6 +126,17 @@ resource "aws_instance" "blue" {
   }
 }
 
+# Elastic IP for BLUE
+resource "aws_eip" "blue_eip" {
+  instance = aws_instance.blue.id
+  domain   = "vpc"
+
+  tags = {
+    Name      = "blue-eip"
+    CreatedAt = timestamp()
+  }
+}
+
 # --- Green EC2 ---
 resource "aws_instance" "green" {
   ami                    = "ami-03b292fa1437b64db"
@@ -138,6 +149,17 @@ resource "aws_instance" "green" {
 
   tags = {
     Name = "prod-green"
+  }
+}
+
+# Elastic IP for GREEN
+resource "aws_eip" "green_eip" {
+  instance = aws_instance.green.id
+  domain   = "vpc"
+
+  tags = {
+    Name      = "green-eip"
+    CreatedAt = timestamp()
   }
 }
 
@@ -188,5 +210,16 @@ EOF
 
   tags = {
     Name = "prod-nginx"
+  }
+}
+
+# Elastic IP for NGINX
+resource "aws_eip" "nginx_eip" {
+  instance = aws_instance.nginx.id
+  domain   = "vpc"
+
+  tags = {
+    Name      = "nginx-eip"
+    CreatedAt = timestamp()
   }
 }
