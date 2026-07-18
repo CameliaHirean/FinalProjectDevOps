@@ -8,6 +8,9 @@ if [ -z "$IMAGE_TAG" ] || [ -z "$ENVIRONMENT" ]; then
   exit 1
 fi
 
+# GHCR login (same as your working pipeline)
+echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+
 APP_DIR="/opt/$ENVIRONMENT"
 PORT=$( [ "$ENVIRONMENT" = "blue" ] && echo "8001" || echo "8002" )
 
