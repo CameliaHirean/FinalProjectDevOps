@@ -132,7 +132,7 @@ resource "aws_instance" "blue" {
   }
 
   provisioner "file" {
-    source      = "scripts/"
+    source      = "../../scripts/"
     destination = "/home/ubuntu/scripts"
   }
 
@@ -147,12 +147,11 @@ resource "aws_instance" "blue" {
 # Elastic IP for BLUE
 resource "aws_eip" "blue_eip" {
   domain        = "vpc"
-  allocation_id = "eipalloc-028b6920b32205f0c"
 }
 
 resource "aws_eip_association" "blue_assoc" {
   instance_id   = aws_instance.blue.id
-  allocation_id = aws_eip.blue_eip.id
+  allocation_id = "eipalloc-028b6920b32205f0c"
 }
 
 
@@ -177,7 +176,7 @@ resource "aws_instance" "green" {
   }
 
   provisioner "file" {
-    source      = "scripts/"
+    source      = "../../scripts/"
     destination = "/home/ubuntu/scripts"
   }
 
@@ -192,12 +191,11 @@ resource "aws_instance" "green" {
 # Elastic IP for GREEN
 resource "aws_eip" "green_eip" {
   domain        = "vpc"
-  allocation_id = "eipalloc-0d5f4d15ba12120de"
 }
 
 resource "aws_eip_association" "green_assoc" {
   instance_id   = aws_instance.green.id
-  allocation_id = aws_eip.green_eip.id
+    allocation_id = "eipalloc-0d5f4d15ba12120de"
 }
 
 
@@ -257,7 +255,7 @@ EOF
   }
 
   provisioner "file" {
-    source      = "scripts/"
+    source      = "../../scripts/"
     destination = "/home/ubuntu/scripts"
   }
 
@@ -272,11 +270,10 @@ EOF
 # Elastic IP for NGINX
 resource "aws_eip" "nginx_eip" {
   domain        = "vpc"
-  allocation_id = "eipalloc-02422f2a06ed54d66"
 }
 
 resource "aws_eip_association" "nginx_assoc" {
   instance_id   = aws_instance.nginx.id
-  allocation_id = aws_eip.nginx_eip.id
+  allocation_id = "eipalloc-02422f2a06ed54d66"
 }
 

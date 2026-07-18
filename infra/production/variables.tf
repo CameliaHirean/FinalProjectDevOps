@@ -15,3 +15,9 @@ variable "region" {
   type        = string
   default     = "eu-north-1"
 }
+
+variable "ec2_private_key_path" {
+  description = "Path to the private SSH key used for EC2 provisioners"
+  type        = string
+}
+
