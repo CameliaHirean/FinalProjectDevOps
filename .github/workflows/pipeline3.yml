@@ -20,6 +20,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        
+      - name: Add SSH key
+        run: |
+            echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+            chmod 600 key.pem
 
       # ---------------------------------------------------------
       # 1. Detect idle environment (blue or green)
