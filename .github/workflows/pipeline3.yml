@@ -72,7 +72,8 @@ jobs:
           ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$HOST \
              "GHCR_TOKEN='${{ secrets.GHCR_TOKEN }}' \
               GHCR_USERNAME='cameliahirean' \
-              bash ~/scripts/deploy_idle.sh ${{ github.event.inputs.image_tag }} $IDLE"
+              bash ~/scripts/deploy_idle.sh $IDLE ${{ github.event.inputs.image_tag }}"
+
 
   # ---------------------------------------------------------
   # 3. Health check

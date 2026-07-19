@@ -261,7 +261,8 @@ systemctl restart nginx
 # Allow ubuntu to reload nginx and update symlink without password
 cat <<EOT > /etc/sudoers.d/bluegreen
 ubuntu ALL=(ALL) NOPASSWD: /usr/bin/systemctl reload nginx
-ubuntu ALL=(ALL) NOPASSWD: /bin/ln -sf /etc/nginx/upstreams/* /etc/nginx/conf.d/active.conf
+ubuntu ALL=(ALL) NOPASSWD: /bin/ln -sf /etc/nginx/upstreams/blue.conf /etc/nginx/conf.d/active.conf
+ubuntu ALL=(ALL) NOPASSWD: /bin/ln -sf /etc/nginx/upstreams/green.conf /etc/nginx/conf.d/active.conf
 ubuntu ALL=(ALL) NOPASSWD: /usr/bin/tee /var/run/blue-green-state
 EOT
 

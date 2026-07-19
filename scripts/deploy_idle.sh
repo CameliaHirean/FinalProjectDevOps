@@ -1,37 +1,32 @@
 #!/bin/bash
 
-IMAGE_TAG=$1
-ENVIRONMENT=$2  # "blue" or "green"
+IDLE_ENV=$1
+IMAGE_TAG=$2
 
-if [ -z "$IMAGE_TAG" ] || [ -z "$ENVIRONMENT" ]; then
-  echo "Usage: deploy_to_idle.sh <image_tag> <blue|green>"
+if [ "$IDLE_ENV" != "blue" ] && [ "$IDLE_ENV" != "green" ]; then
+  echo "Usage: deploy_idle.sh <blue|green> <image_tag>"
   exit 1
 fi
 
 # GHCR login
 echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
 
-PORT=$( [ "$ENVIRONMENT" = "blue" ] && echo "8001" || echo "8002" )
+PORT=$( [ "$IDLE_ENV" = "blue" ] && echo "8001" || echo "8002" )
 
-echo "Deploying image $IMAGE_TAG to $ENVIRONMENT on port $PORT"
+echo "Deploying image $IMAGE_TAG to $IDLE_ENV on port $PORT"
 
 # Pull image
-docker pull ghcr.io/cameliahirean/medical-app:$IMAGE_TAG || {
-  echo "Image pull failed!"
-  exit 1
-}
+docker pull ghcr.io/cameliahirean/medical-app:$IMAGE_TAG
 
-# Stop old container
-docker stop app-$ENVIRONMENT || true
-docker rm app-$ENVIRONMENT || true
+# Stop only the idle environment container
+docker stop app-$IDLE_ENV || true
+docker rm app-$IDLE_ENV || true
 
-# Run new container
+# Run new version ONLY on idle environment
 docker run -d \
-  --name app-$ENVIRONMENT \
+  --name app-$IDLE_ENV \
+  -e PORT=3000 \
   -p $PORT:3000 \
-  ghcr.io/cameliahirean/medical-app:$IMAGE_TAG || {
-    echo "Container failed to start!"
-    exit 1
-}
+  ghcr.io/cameliahirean/medical-app:$IMAGE_TAG
 
-echo "Deployment to $ENVIRONMENT completed"
+echo "Deployment to $IDLE_ENV completed"
