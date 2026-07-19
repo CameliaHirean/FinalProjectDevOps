@@ -151,7 +151,13 @@ jobs:
 
           echo "Starting rollback monitor for $IDLE"
 
-          PRODUCTION_URL="http://127.0.0.1"
+          if [ "$IDLE" = "blue" ]; then
+            HOST=${BLUE_HOST}
+            APP_PORT=8001
+          else
+            HOST=${GREEN_HOST}
+            APP_PORT=8002
+          fi
 
-          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$NGINX_HOST \
-            "bash ~/scripts/rollback_monitor.sh $PRODUCTION_URL $IDLE"
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$HOST \
+            "bash ~/scripts/rollback_monitor.sh http://127.0.0.1:$APP_PORT $IDLE"
