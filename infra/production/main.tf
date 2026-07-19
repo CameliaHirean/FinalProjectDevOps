@@ -226,6 +226,9 @@ apt-get install -y nginx
 systemctl enable nginx
 systemctl start nginx
 
+# Create upstream folder
+mkdir -p /etc/nginx/upstreams
+
 # Create upstream configs
 cat <<EOT > /etc/nginx/upstreams/blue.conf
 upstream app {
@@ -264,6 +267,7 @@ EOT
 
 chmod 440 /etc/sudoers.d/bluegreen
 EOF
+
 
   tags = {
     Name = "prod-nginx"
