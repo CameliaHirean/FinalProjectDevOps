@@ -207,7 +207,7 @@ export default function Dashboard() {
               <div className="mb-2 flex items-center gap-2">
                 <span className="text-3xl">👋</span>
                 <h1 className="text-3xl font-bold">
-                  Hello there
+                  Hello there!
                 </h1>
               </div>
               <p className="text-lg font-medium text-blue-50">
