@@ -151,5 +151,7 @@ jobs:
 
           echo "Starting rollback monitor for $IDLE"
 
+          PRODUCTION_URL="http://127.0.0.1"
+
           ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$NGINX_HOST \
-            "bash ~/scripts/rollback_monitor.sh https://your-production-url $IDLE"
+            "bash ~/scripts/rollback_monitor.sh $PRODUCTION_URL $IDLE"
