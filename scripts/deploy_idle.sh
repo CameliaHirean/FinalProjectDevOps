@@ -28,7 +28,7 @@ docker rm app-$ENVIRONMENT || true
 # Run new container
 docker run -d \
   --name app-$ENVIRONMENT \
-  -p $PORT:$PORT \
+  -p $PORT:3000 \
   ghcr.io/cameliahirean/medical-app:$IMAGE_TAG || {
     echo "Container failed to start!"
     exit 1
