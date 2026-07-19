@@ -8,7 +8,7 @@ if [ "$ENVIRONMENT" != "blue" ] && [ "$ENVIRONMENT" != "green" ]; then
 fi
 
 # Switch NGINX upstream
-sudo ln -sf /etc/nginx/conf.d/$ENVIRONMENT.conf /etc/nginx/conf.d/active.conf
+sudo ln -sf /etc/nginx/upstreams/$ENVIRONMENT.conf /etc/nginx/conf.d/active.conf
 
 # Reload NGINX
 sudo systemctl reload nginx
