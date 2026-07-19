@@ -19,7 +19,7 @@ for i in {1..20}; do
     echo "Health check failed. Rolling back to $OLD_ENV"
 
     # Switch NGINX upstream
-    sudo ln -sf /etc/nginx/conf.d/$OLD_ENV.conf /etc/nginx/conf.d/active.conf
+    sudo ln -sf /etc/nginx/upstreams/$OLD_ENV.conf /etc/nginx/conf.d/active.conf
 
     # Reload NGINX
     sudo systemctl reload nginx

@@ -227,7 +227,7 @@ systemctl enable nginx
 systemctl start nginx
 
 # Create upstream configs
-cat <<EOT > /etc/nginx/conf.d/blue.conf
+cat <<EOT > /etc/nginx/upstreams/blue.conf
 upstream app {
     server ${aws_instance.blue.private_ip}:8001;
 }
@@ -239,7 +239,7 @@ server {
 }
 EOT
 
-cat <<EOT > /etc/nginx/conf.d/green.conf
+cat <<EOT > /etc/nginx/upstreams/green.conf
 upstream app {
     server ${aws_instance.green.private_ip}:8002;
 }
@@ -252,13 +252,13 @@ server {
 EOT
 
 # Activate blue by default
-ln -sf /etc/nginx/conf.d/blue.conf /etc/nginx/conf.d/active.conf
+ln -sf /etc/nginx/upstreams/blue.conf /etc/nginx/conf.d/active.conf
 systemctl restart nginx
 
 # Allow ubuntu to reload nginx and update symlink without password
 cat <<EOT > /etc/sudoers.d/bluegreen
 ubuntu ALL=(ALL) NOPASSWD: /usr/bin/systemctl reload nginx
-ubuntu ALL=(ALL) NOPASSWD: /bin/ln -sf /etc/nginx/conf.d/* /etc/nginx/conf.d/active.conf
+ubuntu ALL=(ALL) NOPASSWD: /bin/ln -sf /etc/nginx/upstreams/* /etc/nginx/conf.d/active.conf
 ubuntu ALL=(ALL) NOPASSWD: /usr/bin/tee /var/run/blue-green-state
 EOT
 
