@@ -7,10 +7,13 @@ if [ "$ENVIRONMENT" != "blue" ] && [ "$ENVIRONMENT" != "green" ]; then
   exit 1
 fi
 
-ln -sf /etc/nginx/conf.d/$ENVIRONMENT.conf /etc/nginx/conf.d/active.conf
+# Switch NGINX upstream
+sudo ln -sf /etc/nginx/conf.d/$ENVIRONMENT.conf /etc/nginx/conf.d/active.conf
 
-systemctl reload nginx
+# Reload NGINX
+sudo systemctl reload nginx
 
-echo "$ENVIRONMENT" > /var/run/blue-green-state
+# Update state file
+echo "$ENVIRONMENT" | sudo tee /var/run/blue-green-state > /dev/null
 
 echo "Traffic switched to $ENVIRONMENT"
