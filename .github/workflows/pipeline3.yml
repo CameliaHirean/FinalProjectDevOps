@@ -138,6 +138,8 @@ jobs:
     needs: [detect_idle, switch_traffic]
     env:
       NGINX_HOST: ${{ secrets.NGINX_HOST }}
+      BLUE_HOST: ${{ secrets.BLUEGREEN_HOST_BLUE }}
+      GREEN_HOST: ${{ secrets.BLUEGREEN_HOST_GREEN }}
 
     steps:
       - name: Add SSH key
