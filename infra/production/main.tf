@@ -254,6 +254,15 @@ EOT
 # Activate blue by default
 ln -sf /etc/nginx/conf.d/blue.conf /etc/nginx/conf.d/active.conf
 systemctl restart nginx
+
+# Allow ubuntu to reload nginx and update symlink without password
+cat <<EOT > /etc/sudoers.d/bluegreen
+ubuntu ALL=(ALL) NOPASSWD: /usr/bin/systemctl reload nginx
+ubuntu ALL=(ALL) NOPASSWD: /bin/ln -sf /etc/nginx/conf.d/* /etc/nginx/conf.d/active.conf
+ubuntu ALL=(ALL) NOPASSWD: /usr/bin/tee /var/run/blue-green-state
+EOT
+
+chmod 440 /etc/sudoers.d/bluegreen
 EOF
 
   tags = {
