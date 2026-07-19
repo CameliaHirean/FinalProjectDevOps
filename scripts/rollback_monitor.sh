@@ -17,9 +17,17 @@ for i in {1..20}; do
 
   if [ "$STATUS" -ne 200 ]; then
     echo "Health check failed. Rolling back to $OLD_ENV"
-    ln -sf /etc/nginx/conf.d/$OLD_ENV.conf /etc/nginx/conf.d/active.conf
-    systemctl reload nginx
-    echo "$OLD_ENV" > /var/run/blue-green-state
+
+    # Switch NGINX upstream
+    sudo ln -sf /etc/nginx/conf.d/$OLD_ENV.conf /etc/nginx/conf.d/active.conf
+
+    # Reload NGINX
+    sudo systemctl reload nginx
+
+    # Update state file
+    echo "$OLD_ENV" | sudo tee /var/run/blue-green-state > /dev/null
+
+    echo "Rollback to $OLD_ENV completed"
     exit 1
   fi
 
