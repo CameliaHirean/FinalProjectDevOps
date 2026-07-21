@@ -211,7 +211,7 @@ export default function Dashboard() {
                 </h1>
               </div>
               <p className="text-lg font-medium text-blue-50">
-                How are you today?
+                How are you feeling today?
               </p>
               <p className="mt-2 max-w-xl text-sm text-blue-100">
                 Keep your routine focused on daily vitals, workouts, and history in one place.
